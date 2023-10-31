@@ -5,25 +5,34 @@ pipeline {
         maven 'Maven3'
     }
 	stages{
-	stage("Cleanup Workspace"){
+		stage("Cleanup Workspace"){
                 steps {
-                cleanWs()
+               	 cleanWs()
                 }
         }
 		 stage("Checkout from SCM"){
-                steps {
+              	  steps {
                     git branch: 'main', credentialsId: 'github', url: 'https://github.com/Googleoy/register-app.git'
                 }
         }
-	      stage("Build Application"){
-            steps {
-                sh "mvn clean package"
+	      	stage("Build Application"){
+           	 steps {
+               	 	sh "mvn clean package"
             }
 		}
 		   stage("Test Application"){
-           steps {
-                 sh "mvn test"
+          	     steps {
+               		sh "mvn test"
            }
         }
-    }
+		 stage("SonarQube Analysis"){
+          	    steps {
+	               script {
+		           withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
+                           sh "mvn sonar:sonar"
+		        }
+	           }
+		}
+         }
+     }
 }
