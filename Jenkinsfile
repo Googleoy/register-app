@@ -11,9 +11,8 @@ pipeline {
             DOCKER_PASS = 'dockerhub'
             IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-	    
-    }
-    stages{
+   } 
+     stages{
         stage("Cleanup Workspace"){
                 steps {
                 cleanWs()
@@ -27,12 +26,12 @@ pipeline {
 	      	stage("Build Application"){
            	 steps {
                	 	sh "mvn clean package"
-            }
+        }
 		}
 		   stage("Test Application"){
           	     steps {
                		sh "mvn test"
-           }
+                }
         }
 		 stage("SonarQube Analysis"){
           	    steps {
@@ -61,15 +60,16 @@ pipeline {
                     steps {
                       script {
                         docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
+                           docker_image = docker.build "${IMAGE_NAME}"
                     }
 
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
+                       docker.withRegistry('',DOCKER_PASS) {
+                           docker_image.push("${IMAGE_TAG}")
+                           docker_image.push('latest')
                     }
                 }
             }
 	 }	
-      }
+    }
+  }
 }
